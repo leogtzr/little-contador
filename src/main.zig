@@ -28,13 +28,9 @@ pub fn main(init: std.process.Init) !void {
         else => |e| return e,
     };
 
-    // Ahora tienes las líneas por separado en lines.items
-    // std.debug.print("Se leyeron {d} líneas del archivo '{s}'\n", .{
-    //     lines.items.len,
-    //     filename,
-    // });
-
     for (lines.items) |line| {
+        if (std.mem.startsWith(u8, line, "#")) continue;
+
         // std.debug.print("Línea {d}: '{s}'\n", .{ i, line });
 
         var fields = try utils.splitLine(arena, line, '|');
@@ -49,7 +45,7 @@ pub fn main(init: std.process.Init) !void {
         const currentDate = utils.getCurrentDate(io);
         const counterExpectedParsedDate = try utils.parseDate(date);
 
-        const daysInBetween = utils.daysBetween(counterExpectedParsedDate, currentDate);
+        const daysInBetween = utils.daysBetween(currentDate, counterExpectedParsedDate);
 
         try writers.stdout().print("The date is: {s}, from now: {d}\n", .{ date, daysInBetween });
 
