@@ -3,9 +3,8 @@ const Io = std.Io;
 const contador = @import("contador");
 const lector = @import("reader.zig");
 const utils = @import("utils.zig");
-pub fn main(init: std.process.Init) !void {
-    // std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
 
+pub fn main(init: std.process.Init) !void {
     const arena = init.arena.allocator();
     const io = init.io;
     var writers = utils.Writers.init(io);
@@ -31,26 +30,30 @@ pub fn main(init: std.process.Init) !void {
     for (lines.items) |line| {
         if (std.mem.startsWith(u8, line, "#")) continue;
 
-        // std.debug.print("Línea {d}: '{s}'\n", .{ i, line });
-
         var fields = try utils.splitLine(arena, line, '|');
         defer {
             for (fields.items) |field| arena.free(field);
             fields.deinit(arena);
         }
 
-        try writers.stdout().print("Linea: '{s}'\n", .{line});
+        try printLine(&fields.items, &writers, &io);
+    }
+}
 
-        const date = fields.items[1];
-        const currentDate = utils.getCurrentDate(io);
-        const counterExpectedParsedDate = try utils.parseDate(date);
+fn printLine(fields: *const []const []const u8, writers: *utils.Writers, io: *const std.Io) !void {
+    const event = fields.*[0];
+    const date = fields.*[1];
+    const currentDate = utils.getCurrentDate(io.*);
+    const counterExpectedParsedDate = try utils.parseDate(date);
 
-        const daysInBetween = utils.daysBetween(currentDate, counterExpectedParsedDate);
+    const daysInBetween = utils.daysBetween(currentDate, counterExpectedParsedDate);
+    try utils.Color.cyan(writers.stdout(), "{s}{s}{s}", .{ utils.Color.Bold, event, utils.Color.Reset });
 
-        try writers.stdout().print("The date is: {s}, from now: {d}\n", .{ date, daysInBetween });
-
-        for (fields.items) |field| {
-            try writers.stdout().print("f{{{s}}}\n\t", .{field});
-        }
+    try writers.stdout().print("'{s}' in {d} days", .{ event, daysInBetween });
+    if (fields.*.len > 2) {
+        const notes = fields.*[2];
+        try writers.stdout().print("\t\t... {s}\n", .{notes});
+    } else {
+        try writers.stdout().print("\n", .{});
     }
 }

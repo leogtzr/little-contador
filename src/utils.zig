@@ -99,5 +99,35 @@ pub fn daysBetween(date1: Date, date2: Date) i64 {
     const ts1 = dateToTimestamp(date1);
     const ts2 = dateToTimestamp(date2);
 
+    // 86400 seconds in a day.
     return @divTrunc(ts2 - ts1, 86400);
 }
+
+pub const Color = struct {
+    pub const Reset = "\x1b[0m";
+    pub const Red = "\x1b[31m";
+    pub const Green = "\x1b[32m";
+    pub const Yellow = "\x1b[33m";
+    pub const Cyan = "\x1b[36m";
+    pub const Bold = "\x1b[1m";
+
+    pub fn print(writer: *std.Io.Writer, color: []const u8, fmt: []const u8, args: anytype) !void {
+        try writer.print(color ++ fmt ++ Reset ++ args);
+    }
+
+    pub fn red(writer: *std.Io.Writer, fmt: []const u8, args: anytype) !void {
+        try print(writer, Red, fmt, args);
+    }
+
+    pub fn green(writer: *std.Io.Writer, fmt: []const u8, args: anytype) !void {
+        try print(writer, Green, fmt, args);
+    }
+
+    pub fn yellow(writer: *std.Io.Writer, fmt: []const u8, args: anytype) !void {
+        try print(writer, Yellow, fmt, args);
+    }
+
+    pub fn cyan(writer: *std.Io.Writer, fmt: []const u8, args: anytype) !void {
+        try print(writer, Cyan, fmt, args);
+    }
+};
