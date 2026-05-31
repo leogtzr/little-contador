@@ -2,3 +2,5 @@
 zig-out/
 *.o
 ejemplo.txt
+input.txt
+.claude/settings.local.json

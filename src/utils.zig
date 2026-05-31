@@ -111,23 +111,23 @@ pub const Color = struct {
     pub const Cyan = "\x1b[36m";
     pub const Bold = "\x1b[1m";
 
-    pub fn print(writer: *std.Io.Writer, color: []const u8, fmt: []const u8, args: anytype) !void {
-        try writer.print(color ++ fmt ++ Reset ++ args);
+    pub fn print(writer: *std.Io.Writer, comptime color: []const u8, comptime fmt: []const u8, args: anytype) !void {
+        try writer.print(color ++ fmt ++ Reset, args);
     }
 
-    pub fn red(writer: *std.Io.Writer, fmt: []const u8, args: anytype) !void {
+    pub fn red(writer: *std.Io.Writer, comptime fmt: []const u8, args: anytype) !void {
         try print(writer, Red, fmt, args);
     }
 
-    pub fn green(writer: *std.Io.Writer, fmt: []const u8, args: anytype) !void {
+    pub fn green(writer: *std.Io.Writer, comptime fmt: []const u8, args: anytype) !void {
         try print(writer, Green, fmt, args);
     }
 
-    pub fn yellow(writer: *std.Io.Writer, fmt: []const u8, args: anytype) !void {
+    pub fn yellow(writer: *std.Io.Writer, comptime fmt: []const u8, args: anytype) !void {
         try print(writer, Yellow, fmt, args);
     }
 
-    pub fn cyan(writer: *std.Io.Writer, fmt: []const u8, args: anytype) !void {
+    pub fn cyan(writer: *std.Io.Writer, comptime fmt: []const u8, args: anytype) !void {
         try print(writer, Cyan, fmt, args);
     }
 };

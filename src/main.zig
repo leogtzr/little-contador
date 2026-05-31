@@ -12,7 +12,7 @@ pub fn main(init: std.process.Init) !void {
     defer writers.stderr_file.flush() catch {};
 
     const args = try init.minimal.args.toSlice(arena);
-    const filename = if (args.len > 1) args[1] else "ejemplo.txt";
+    const filename = if (args.len > 1) args[1] else "input.txt";
 
     // const lines = try lector.readFileLines(arena, io, filename);
     const lines = lector.readFileLines(arena, io, filename) catch |err| switch (err) {
@@ -49,7 +49,13 @@ fn printLine(fields: *const []const []const u8, writers: *utils.Writers, io: *co
     const daysInBetween = utils.daysBetween(currentDate, counterExpectedParsedDate);
     try utils.Color.cyan(writers.stdout(), "{s}{s}{s}", .{ utils.Color.Bold, event, utils.Color.Reset });
 
-    try writers.stdout().print("'{s}' in {d} days", .{ event, daysInBetween });
+    //try writers.stdout().print("'{s}' in {d} days", .{ event, daysInBetween });
+    // Días en verde (positivo) o rojo (negativo)
+    if (daysInBetween >= 0) {
+        try utils.Color.green(writers.stdout(), " en {d} días", .{daysInBetween});
+    } else {
+        try utils.Color.red(writers.stdout(), " hace {d} días", .{-daysInBetween});
+    }
     if (fields.*.len > 2) {
         const notes = fields.*[2];
         try writers.stdout().print("\t\t... {s}\n", .{notes});
