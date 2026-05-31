@@ -4,6 +4,10 @@ const contador = @import("contador");
 const lector = @import("reader.zig");
 const utils = @import("utils.zig");
 
+const math = std.math;
+
+const MIN_NUMBER_OF_FIELDS = 2;
+
 pub fn main(init: std.process.Init) !void {
     const arena = init.arena.allocator();
     const io = init.io;
@@ -14,10 +18,8 @@ pub fn main(init: std.process.Init) !void {
     const args = try init.minimal.args.toSlice(arena);
     const filename = if (args.len > 1) args[1] else "input.txt";
 
-    // const lines = try lector.readFileLines(arena, io, filename);
     const lines = lector.readFileLines(arena, io, filename) catch |err| switch (err) {
         error.FileNotFound => {
-            // writers.stderr.print(comptime fmt: []const u8, args: anytype)
             try writers.stdout().print("Error: El archivo '{s}' no existe.\n", .{filename});
             if (args.len <= 1) {
                 try writers.stderr().print("Uso: {s} <filename>\n", .{args[0]});
@@ -52,11 +54,24 @@ fn printLine(fields: *const []const []const u8, writers: *utils.Writers, io: *co
     //try writers.stdout().print("'{s}' in {d} days", .{ event, daysInBetween });
     // Días en verde (positivo) o rojo (negativo)
     if (daysInBetween >= 0) {
-        try utils.Color.green(writers.stdout(), " en {d} días", .{daysInBetween});
+        try utils.Color.cyan(writers.stdout(), " en {d} días", .{daysInBetween});
     } else {
-        try utils.Color.red(writers.stdout(), " hace {d} días", .{-daysInBetween});
+        if (daysInBetween == 0) {
+            try utils.Color.green(writers.stdout(), " hace {d} días", .{-daysInBetween});
+        } else {
+            const how_many_days = @abs(daysInBetween);
+            // try writers.stdout().print("\nWhat: {d},{d}\n", .{daysInBetween, how_many_days});
+
+            if (how_many_days == 1 or how_many_days == 0) {
+                try utils.Color.green(writers.stdout(), " hoy ({d}-{d}-{d})...", .{currentDate.year, currentDate.month, currentDate.day});
+            } else if (how_many_days > 1 and how_many_days <= 3) {
+                try utils.Color.gray(writers.stdout(), " hace {d} días", .{-daysInBetween});
+            } else {
+                try utils.Color.yellow(writers.stdout(), " hace {d} días", .{-daysInBetween});
+            }
+        }
     }
-    if (fields.*.len > 2) {
+    if (fields.*.len > MIN_NUMBER_OF_FIELDS) {
         const notes = fields.*[2];
         try writers.stdout().print("\t\t... {s}\n", .{notes});
     } else {
