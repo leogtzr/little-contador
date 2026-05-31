@@ -51,7 +51,6 @@ fn printLine(fields: *const []const []const u8, writers: *utils.Writers, io: *co
     const daysInBetween = utils.daysBetween(currentDate, counterExpectedParsedDate);
     try utils.Color.cyan(writers.stdout(), "{s}{s}{s}", .{ utils.Color.Bold, event, utils.Color.Reset });
 
-    //try writers.stdout().print("'{s}' in {d} days", .{ event, daysInBetween });
     // Días en verde (positivo) o rojo (negativo)
     if (daysInBetween >= 0) {
         try utils.Color.cyan(writers.stdout(), " en {d} días", .{daysInBetween});
@@ -60,8 +59,6 @@ fn printLine(fields: *const []const []const u8, writers: *utils.Writers, io: *co
             try utils.Color.green(writers.stdout(), " hace {d} días", .{-daysInBetween});
         } else {
             const how_many_days = @abs(daysInBetween);
-            // try writers.stdout().print("\nWhat: {d},{d}\n", .{daysInBetween, how_many_days});
-
             if (how_many_days == 1 or how_many_days == 0) {
                 try utils.Color.green(writers.stdout(), " hoy ({d}-{d}-{d})...", .{currentDate.year, currentDate.month, currentDate.day});
             } else if (how_many_days > 1 and how_many_days <= 3) {
@@ -72,7 +69,7 @@ fn printLine(fields: *const []const []const u8, writers: *utils.Writers, io: *co
         }
     }
     if (fields.*.len > MIN_NUMBER_OF_FIELDS) {
-        const notes = fields.*[2];
+        const notes = fields.*[MIN_NUMBER_OF_FIELDS];
         try writers.stdout().print("\t\t... {s}\n", .{notes});
     } else {
         try writers.stdout().print("\n", .{});
